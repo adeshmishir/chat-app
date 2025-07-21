@@ -98,3 +98,76 @@ export const sendMessage=async(req,res)=>{
         res.json({success:false,message:error.message});
     }
 }
+export const editMessage = async (req, res) => {
+  try {
+    const { messageId } = req.params;
+    const { text } = req.body;
+    const userId = req.user._id;
+
+    const message = await Message.findById(messageId);
+    if (!message) return res.status(404).json({ success: false, message: "Message not found" });
+    if (!message.senderId.equals(userId)) return res.status(403).json({ success: false, message: "Not authorized" });
+
+    message.text = text;
+    message.isEdited = true;
+    await message.save();
+
+    const receiverSocketId = userSocketMap[message.receiverId];
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("messageEdited", { _id: messageId, text, isEdited: true });
+    }
+
+    res.json({ success: true, message: "Message edited", updatedMessage: message });
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+  }
+};
+
+export const deleteMessage = async (req, res) => {
+  try {
+    const { messageId } = req.params;
+    const userId = req.user._id;
+
+    const message = await Message.findById(messageId);
+    if (!message) return res.status(404).json({ success: false, message: "Message not found" });
+    if (!message.senderId.equals(userId)) return res.status(403).json({ success: false, message: "Not authorized" });
+
+    message.text = "";
+    message.image = "";
+    message.deleted = true;
+    await message.save();
+
+    const receiverSocketId = userSocketMap[message.receiverId];
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("messageDeleted", { _id: messageId, deleted: true });
+    }
+
+    res.json({ success: true, message: "Message deleted", deletedMessage: message });
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+  }
+};
+export const permanentlyDeleteMessage = async (req, res) => {
+  try {
+    const { messageId } = req.params;
+    const userId = req.user._id;
+
+    const message = await Message.findById(messageId);
+    if (!message) return res.status(404).json({ success: false, message: "Message not found" });
+    if (!message.senderId.equals(userId)) return res.status(403).json({ success: false, message: "Not authorized" });
+
+    await message.deleteOne();
+
+    // Optionally notify receiver that the message was permanently deleted:
+    const receiverSocketId = userSocketMap[message.receiverId];
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("messagePermanentlyDeleted", { _id: messageId });
+    }
+
+    res.json({ success: true, message: "Message permanently deleted" });
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+  }
+};
+
+
