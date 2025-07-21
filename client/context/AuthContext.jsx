@@ -78,7 +78,7 @@ export const AuthProvider = ({ children }) => {
     if (!userData || socket?.connected) return;
      console.log("🧠 Connecting socket with userId:", userData._id);
 
-    const newSocket = io("http://localhost:5000", {
+    const newSocket = io(VITE_BACKEND_URL, {
       auth: {
         userId: userData._id,
         token: localStorage.getItem("token"),
