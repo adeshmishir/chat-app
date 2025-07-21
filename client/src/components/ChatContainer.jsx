@@ -5,9 +5,6 @@ import { formatMessageTime } from "../lib/utils";
 import { ChatContext } from "../../context/ChatContext";
 import { AuthContext } from "../../context/AuthContext";
 import toast from "react-hot-toast";
-import Picker from "@emoji-mart/react";
-
-// import "emoji-mart/css/emoji-mart.css";
 import { FaEdit, FaTrashAlt, FaUserSlash, FaUserTimes } from "react-icons/fa";
 
 const ChatContainer = () => {
@@ -29,7 +26,6 @@ const ChatContainer = () => {
   const [editMsgId, setEditMsgId] = useState(null);
   const [editText, setEditText] = useState("");
   const [showOptionsId, setShowOptionsId] = useState(null);
-  const [showEmoji, setShowEmoji] = useState(false);
   const [deletedForMe, setDeletedForMe] = useState({});
   const [showDeleteOptionsId, setShowDeleteOptionsId] = useState(null);
 
@@ -38,11 +34,6 @@ const ChatContainer = () => {
     if (input.trim() === "") return null;
     await sendMessage({ text: input.trim() });
     setInput("");
-    setShowEmoji(false);
-  };
-
-  const handleSelectEmoji = (emoji) => {
-    setInput((prev) => prev + emoji.native);
   };
 
   const handleSendImage = async (e) => {
@@ -265,32 +256,6 @@ const ChatContainer = () => {
       {/* Input Area */}
       <div className="absolute bottom-0 left-0 right-0 flex items-center gap-3 p-3 z-10 bg-transparent">
         <div className="flex-1 flex items-center bg-gray-100/12 px-3 rounded-full relative">
-          <button
-            type="button"
-            className="mr-2"
-            style={{ minWidth: 32, minHeight: 32 }}
-            onClick={() => setShowEmoji((v) => !v)}
-          >
-            <img
-              src={
-                assets.emoji_icon ||
-                "https://static.thenounproject.com/png/1620546-200.png"
-              }
-              alt="emoji"
-              className="w-6 h-6"
-            />
-          </button>
-          {showEmoji && (
-            <div className="absolute bottom-14 left-0 z-50">
-              <Picker
-                onSelect={handleSelectEmoji}
-                theme="dark"
-                showPreview={false}
-                showSkinTones={false}
-                style={{ borderRadius: 8 }}
-              />
-            </div>
-          )}
           <input
             onChange={(e) => setInput(e.target.value)}
             value={input}
@@ -298,7 +263,6 @@ const ChatContainer = () => {
             type="text"
             placeholder="Send a message"
             className="flex-1 text-sm p-3 border-none rounded-lg outline-none text-white placeholder-gray-400"
-            onFocus={() => setShowEmoji(false)}
           />
           <input
             onChange={handleSendImage}
