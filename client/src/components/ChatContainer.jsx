@@ -5,8 +5,9 @@ import { formatMessageTime } from "../lib/utils";
 import { ChatContext } from "../../context/ChatContext";
 import { AuthContext } from "../../context/AuthContext";
 import toast from "react-hot-toast";
-import { Picker } from "emoji-mart";
-import "emoji-mart/css/emoji-mart.css";
+import Picker from "@emoji-mart/react";
+
+// import "emoji-mart/css/emoji-mart.css";
 import { FaEdit, FaTrashAlt, FaUserSlash, FaUserTimes } from "react-icons/fa";
 
 const ChatContainer = () => {
